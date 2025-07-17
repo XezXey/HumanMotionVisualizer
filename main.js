@@ -1,6 +1,6 @@
 import * as THREE from "./node_modules/three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+import { Reflector } from "./node_modules/three/examples/jsm/objects/Reflector.js";
 import GUI from "./node_modules/lil-gui";
 
 // import * as THREE from "https://cdn.skypack.dev/three";
