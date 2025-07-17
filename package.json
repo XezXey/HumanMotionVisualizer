@@ -1,0 +1,18 @@
+{
+  "name": "humanmotionvisualizer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "lil-gui": "^0.20.0",
+    "vite": "^7.0.4"
+  },
+  "dependencies": {
+    "three": "^0.178.0"
+  }
+}
