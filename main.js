@@ -6,9 +6,7 @@ import GUI from "./node_modules/lil-gui";
 // import * as THREE from "https://cdn.skypack.dev/three";
 // import { OrbitControls } from "https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js";
 // import { Reflector } from "https://cdn.skypack.dev/three/examples/jsm/objects/Reflector.js";
-// import { GLTFLoader } from "https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js";
 // import GUI from "https://cdn.skypack.dev/lil-gui";
-// import { all, color, split } from "https://cdn.skypack.dev/three/src/nodes/TSL.js";
 
 // Three.js core
 // import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
