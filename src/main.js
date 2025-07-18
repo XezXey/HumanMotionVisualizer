@@ -248,6 +248,7 @@ async function preLoadAllMotion() {
 	const progressDiv = document.getElementById("progresDiv");
 
 	const modules = import.meta.glob("./visualizer/motions/**/*.json", { eager: true, as: "url" });
+
 	console.log("[#] All motion files are loaded:", modules);
 	const fileOptions = Object.keys(modules).map((path) => path.replace("./visualizer/motions/", ""));
 	const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./visualizer/motions/${name}`]]));
