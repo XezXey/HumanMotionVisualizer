@@ -80,7 +80,7 @@ let config = {
 	animate: true,
 	visible: true,
 	split: false, // New config option for split the motion data from the center
-	root_dir: "./visualizer/motions/",
+	root_dir: "./motions/",
 	visall: true,
 	// motion_id: 0,
 	// revoke_same_id: false, // New config option to revoke all skeletons to show the same motion id
@@ -247,11 +247,11 @@ async function preLoadAllMotion() {
 	const progressText = document.getElementById("progressText");
 	const progressDiv = document.getElementById("progresDiv");
 
-	const modules = import.meta.glob("./visualizer/motions/**/*.json", { eager: true, as: "url" });
+	const modules = import.meta.glob("./motions/**/*.json", { eager: true, as: "url" });
 
 	console.log("[#] All motion files are loaded:", modules);
-	const fileOptions = Object.keys(modules).map((path) => path.replace("./visualizer/motions/", ""));
-	const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./visualizer/motions/${name}`]]));
+	const fileOptions = Object.keys(modules).map((path) => path.replace("./motions/", ""));
+	const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./motions/${name}`]]));
 
 	// const fileOptions = Object.keys(modules).map((path) => path.split("/").pop());
 	console.log("[#] Motion file options:", fileOptions);
