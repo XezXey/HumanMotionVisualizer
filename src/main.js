@@ -5,6 +5,8 @@ import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 
 let scene, camera, renderer, controls, cb;
 let allMotionData = {}; // Dict of motion storing the [B, 22, 3, 120] array
+let fileOptions = []; // List of motion file options
+let fileMap = {}; // Map of motion file names to their URLs
 let allDrawnSkeleton = []; // List of all drawn motions
 let currentFrame = 0;
 let frameController;
@@ -217,8 +219,9 @@ async function getCompare() {
 		const jsonData = await response.json();
 		cmpList = Object.values(jsonData).map((entry) => entry.file);
 		// Check all need to be exist in allMotionData
-		cmpList = cmpList.filter((file) => file in allMotionData);
-
+		console.log("Initial motion file list extracted from query:", cmpList);
+		console.log("Filtering motion file list with fileMap keys:", Object.keys(fileMap));
+		cmpList = cmpList.filter((file) => Object.keys(fileMap).includes(file));
 		console.log("Motion file list extracted from query:", cmpList);
 		// If cmpList needs to be used outside, consider returning it or assigning it globally.
 	} catch (error) {
@@ -234,8 +237,8 @@ async function preLoadAllMotion() {
 	const modules = import.meta.glob("./motions/**/*.json", { eager: true, as: "url" });
 
 	console.log("[#] All motion files are loaded:", modules);
-	const fileOptions = Object.keys(modules).map((path) => path.replace("./motions/", ""));
-	const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./motions/${name}`]]));
+	fileOptions = Object.keys(modules).map((path) => path.replace("./motions/", ""));
+	fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./motions/${name}`]]));
 
 	console.log("[#] Motion file options:", fileOptions);
 	console.log("[#] File map created:", fileMap);
@@ -655,7 +658,8 @@ function createGUI() {
 	// 7) Initialize GUI with one slot
 	if (cmpList.length > 0) {
 		for (let i = 0; i < cmpList.length; i++) {
-			fileParams.addSlot(cmpList[i]);
+			// fileParams.addSlot(cmpList[i]);
+			fileParams.addSlot(fileMap[cmpList[i]]); // Add each motion file from cmpList
 		}
 	} else {
 		fileParams.addSlot(null);
