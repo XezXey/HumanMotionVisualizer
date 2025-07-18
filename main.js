@@ -1,7 +1,12 @@
-import * as THREE from "./node_modules/three";
-import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
-import { Reflector } from "./node_modules/three/examples/jsm/objects/Reflector.js";
-import GUI from "./node_modules/lil-gui";
+// import * as THREE from "./node_modules/three";
+// import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
+// import { Reflector } from "./node_modules/three/examples/jsm/objects/Reflector.js";
+// import GUI from "./node_modules/lil-gui";
+
+import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.min.js";
+import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+import { Reflector } from "https://unpkg.com/three@0.158.0/examples/jsm/objects/Reflector.js";
+import GUI from "https://unpkg.com/lil-gui@0.18.0/dist/lil-gui.esm.min.js";
 
 // import * as THREE from "https://cdn.skypack.dev/three";
 // import { OrbitControls } from "https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js";
@@ -181,7 +186,7 @@ function addCheckerboard(patch_size, size) {
 	scene.add(ambientLight);
 }
 
-async function init() {
+export async function init() {
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -706,4 +711,4 @@ function removeSkeleton(i) {
 	}
 }
 
-init();
+// init();
