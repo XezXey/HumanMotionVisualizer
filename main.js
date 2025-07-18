@@ -3,33 +3,15 @@
 // import { Reflector } from "./node_modules/three/examples/jsm/objects/Reflector.js";
 // import GUI from "./node_modules/lil-gui";
 
-import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
-import GUI from "https://unpkg.com/lil-gui@0.18/dist/lil-gui.esm.min.js";
-import { Reflector } from "https://unpkg.com/three@0.158.0/examples/jsm/objects/Reflector.js";
-
-// import * as THREE from "https://cdn.skypack.dev/three";
-// import { OrbitControls } from "https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js";
-// import { Reflector } from "https://cdn.skypack.dev/three/examples/jsm/objects/Reflector.js";
-// import GUI from "https://cdn.skypack.dev/lil-gui";
-
-// Three.js core
 // import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
-// // Controls, Loaders, Reflector from examples
 // import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+// import GUI from "https://unpkg.com/lil-gui@0.18/dist/lil-gui.esm.min.js";
 // import { Reflector } from "https://unpkg.com/three@0.158.0/examples/jsm/objects/Reflector.js";
-// import { GLTFLoader } from "https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
-// // lil-gui (modern GUI for dat.GUI)
-// import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.18/+esm";
-// // TSL nodes from Three.js (advanced shader nodes system)
-// import { all, color, split } from "https://unpkg.com/three@0.158.0/examples/jsm/nodes/Nodes.js";
 
-// import * as THREE from "three";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-// import { Reflector } from "three/examples/jsm/objects/Reflector.js";
-// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// import GUI from "lil-gui";
-// import { all, color, split } from "three/src/nodes/TSL.js";
+import * as THREE from "./js/three.module.js";
+import { OrbitControls } from "./js/OrbitControls.js";
+import GUI from "./js/lil-gui.esm.min.js";
+import { Reflector } from "./js/Reflector.js";
 
 let scene, camera, renderer, controls, cb;
 let allMotionData = {}; // Dict of motion storing the [B, 22, 3, 120] array
