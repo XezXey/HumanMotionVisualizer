@@ -2,21 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
-// import "./style.css"; // Assuming you have a style.css for basic styles
-
-// import { OrbitControls } from "./OrbitControls.js";
-// import GUI from "./lil-gui.esm.min.js";
-// import { Reflector } from "./Reflector.js";
-
-// import * as THREE from "./node_modules/three";
-// import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
-// import { Reflector } from "./node_modules/three/examples/jsm/objects/Reflector.js";
-// import GUI from "./node_modules/lil-gui";
-
-// import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
-// import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
-// import GUI from "https://unpkg.com/lil-gui@0.18/dist/lil-gui.esm.min.js";
-// import { Reflector } from "https://unpkg.com/three@0.158.0/examples/jsm/objects/Reflector.js";
 
 let scene, camera, renderer, controls, cb;
 let allMotionData = {}; // Dict of motion storing the [B, 22, 3, 120] array
@@ -80,7 +65,6 @@ let config = {
 	animate: true,
 	visible: true,
 	split: false, // New config option for split the motion data from the center
-	root_dir: "./motions/",
 	visall: true,
 	// motion_id: 0,
 	// revoke_same_id: false, // New config option to revoke all skeletons to show the same motion id
@@ -253,9 +237,7 @@ async function preLoadAllMotion() {
 	const fileOptions = Object.keys(modules).map((path) => path.replace("./motions/", ""));
 	const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`./motions/${name}`]]));
 
-	// const fileOptions = Object.keys(modules).map((path) => path.split("/").pop());
 	console.log("[#] Motion file options:", fileOptions);
-	// const fileMap = Object.fromEntries(fileOptions.map((name) => [name, modules[`${config.root_dir}/${name}`]]));
 	console.log("[#] File map created:", fileMap);
 	for (let i = 0; i < fileOptions.length; i++) {
 		const motionFile = fileMap[fileOptions[i]];
