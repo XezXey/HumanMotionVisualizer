@@ -16,18 +16,31 @@ const frameControl = { frameIndex: 0 };
 let cmpList = []; // List of motion files for comparison
 
 const defaultColor = {
-	jointColor: 0xff0000, // initial hex string
+	// jointColor: 0xff0000, // initial hex string
 	// boneColor: 0x0000ff,
 	boneColor: 0xffffff,
+	// jointColorList: [
+	// 	0xff0000, // Red
+	// 	0xffa500, // Orange
+	// 	0xffff00, // Yellow
+	// 	0x008000, // Green
+	// 	0x0000ff, // Blue
+	// 	0x9400d3, // Violet
+	// 	0x00ffff, // Cyan
+	// 	0x000000, // Black
+	// ],
 	jointColorList: [
 		0xff0000, // Red
 		0xffa500, // Orange
 		0xffff00, // Yellow
 		0x008000, // Green
 		0x0000ff, // Blue
-		// 0x4b0082, // Indigo
 		0x9400d3, // Violet
 		0x00ffff, // Cyan
+		0xff00ff, // Magenta (New)
+		0x010101, // Black
+		0xbfff00, // Lime (New)
+		0x008b8b, // Dark Cyan / Teal (New)
 	],
 };
 
