@@ -2,12 +2,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { update } from "three/examples/jsm/libs/tween.module.js";
 
 let scene, camera, renderer, controls, cb;
 let allMotionData = {}; // Dict of motion storing the [B, 22, 3, 120] array
 let fileOptions = []; // List of motion file options
 let fileMap = {}; // Map of motion file names to their URLs
 let allDrawnSkeleton = []; // List of all drawn motions
+let allDrawnConditionTrajectory = []; // List of all drawn condition trajectories
 let currentFrame = 0;
 let frameController;
 const numJoints = 22;
@@ -285,7 +287,17 @@ async function loadMotionData(motion_file, idx) {
 			motions: jsonData.motions,
 			prompts: jsonData.prompts,
 			n_motions: jsonData.motions.length,
+			condition_trajectory: jsonData.condition_trajectory || null,
+			condition_mask: jsonData.condition_mask || null,
 		};
+		if (jsonData.condition_mask) {
+			console.log(jsonData.condition_mask);
+			console.log(jsonData.condition_mask[0][0][0] && true);
+			console.log(jsonData.condition_mask[0][0][0] && false);
+			console.log(jsonData.condition_mask[0][0][0] || true);
+			console.log(jsonData.condition_mask[0][0][0] || false);
+		}
+		// check type of condition_mask whether it's list of boolean or list of string
 	} catch (error) {
 		console.error("Error loading motion data:", error);
 	}
@@ -368,7 +380,51 @@ function updateAllSkeleton() {
 		const motionKey = allDrawnSkeleton[i].motionFile;
 		const motionData = allMotionData[motionKey]; // Get the motion data for the current skeleton
 		const skeletonData = allDrawnSkeleton[i]; // Get the skeleton data for the current skeleton
+		// updateConditionTrajectory(motionData, used_offset * split_offset);
 		updateSkeleton(motionData, skeletonData, used_offset * split_offset);
+		// updateConditionTrajectory(motionData, skeletonData, used_offset * split_offset);
+	}
+}
+
+function updateConditionTrajectory(motionData, offset = 0) {
+	let condition_trajectory_list = motionData.condition_trajectory;
+	let motionIndex = skeletonData.motionIndex || 0;
+	const currentMotion = motion_list[motionIndex];
+	framesPerMotion = currentMotion[0][0].length; // Update framesPerMotion
+	frameController.min(0).max(framesPerMotion - 1);
+	frameController.updateDisplay();
+
+	if (!currentMotion || !joint) return;
+
+	for (let i = 0; i < numJoints; i++) {
+		const x = currentMotion[i][0][currentFrame] + offset;
+		const y = currentMotion[i][1][currentFrame];
+		const z = currentMotion[i][2][currentFrame];
+		joint[i].position.set(x, y, z);
+		joint[i].material.color.setHex(jointColor); // Set joint color to red
+	}
+
+	for (let i = 0; i < JOINT_CONNECTIONS.length; i++) {
+		const [startIdx, endIdx] = JOINT_CONNECTIONS[i];
+		const line = bones[i];
+
+		// Get start/end positions from each joint
+		const startPos = joint[startIdx].position;
+		const endPos = joint[endIdx].position;
+
+		// Update the line geometry's position attribute
+		const positions = line.geometry.attributes.position.array;
+		positions[0] = startPos.x;
+		positions[1] = startPos.y;
+		positions[2] = startPos.z;
+		positions[3] = endPos.x;
+		positions[4] = endPos.y;
+		positions[5] = endPos.z;
+
+		// Mark attribute as needing an update
+		line.geometry.attributes.position.needsUpdate = true;
+
+		bones[i].material.color.setHex(boneColor); // Set bone color to blue
 	}
 }
 
@@ -463,7 +519,9 @@ function addRemove_DrawnSkeleton(is_add, idx, fn) {
 	let boneColor = defaultColor.boneColor;
 	let joint = [];
 	let bones = [];
+	let cond_traj = [];
 	[joint, bones] = createSkeleton(joint, bones, jointColor, boneColor);
+	// cond_traj = createConditionTrajectory(cond_traj, jointColor);
 	const skeleton = {
 		joint: joint,
 		bones: bones,
@@ -478,6 +536,18 @@ function addRemove_DrawnSkeleton(is_add, idx, fn) {
 		allDrawnSkeleton.push(skeleton);
 	} else {
 		allDrawnSkeleton.pop();
+	}
+}
+
+function createConditionTrajectory(cond_traj, jointColor) {
+	if (cond_traj) {
+		cond_traj.forEach((cond_traj) => scene.remove(cond_traj));
+	}
+	for (let i = 0; i < numJoints; i++) {
+		const jointMesh = new THREE.Mesh(sphereGeometry, material);
+		jointMesh.castShadow = config.shadow;
+		scene.add(jointMesh);
+		joint.push(jointMesh);
 	}
 }
 
