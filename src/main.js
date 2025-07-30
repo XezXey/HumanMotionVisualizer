@@ -287,15 +287,16 @@ async function loadMotionData(motion_file, idx) {
 			motions: jsonData.motions,
 			prompts: jsonData.prompts,
 			n_motions: jsonData.motions.length,
-			condition_trajectory: jsonData.condition_trajectory || null,
-			condition_mask: jsonData.condition_mask || null,
+			condition_trajectory: jsonData.condition_trajectory || null,	// B x T x 22 x 3
+			condition_mask: jsonData.condition_mask || null,	// B x T x 22
 		};
 		if (jsonData.condition_mask) {
-			console.log(jsonData.condition_mask);
-			console.log(jsonData.condition_mask[0][0][0] && true);
-			console.log(jsonData.condition_mask[0][0][0] && false);
-			console.log(jsonData.condition_mask[0][0][0] || true);
-			console.log(jsonData.condition_mask[0][0][0] || false);
+			console.log("Condition mask loaded for motion file:", motion_file);
+			console.log("Condition mask shape:", jsonData.condition_mask.length, "x", jsonData.condition_mask[0].length, "x", jsonData.condition_mask[0][0].length);
+		}
+		if (jsonData.condition_trajectory) {
+			console.log("Condition trajectory loaded for motion file:", motion_file);
+			console.log("Condition trajectory shape:", jsonData.condition_trajectory.length, "x", jsonData.condition_trajectory[0].length, "x", jsonData.condition_trajectory[0][0].length, "x", jsonData.condition_trajectory[0][0][0].length);
 		}
 		// check type of condition_mask whether it's list of boolean or list of string
 	} catch (error) {
@@ -376,56 +377,61 @@ function updateAllSkeleton() {
 		// console.log("Updating skeleton at index:", i);
 		// console.log("Skeleton data:", allDrawnSkeleton[i]);
 		const used_offset = offsetArray[i];
-		const split_offset = config.split ? 1.5 : 0;
+		const split_offset = config.split ? 2 : 0;
 		const motionKey = allDrawnSkeleton[i].motionFile;
 		const motionData = allMotionData[motionKey]; // Get the motion data for the current skeleton
 		const skeletonData = allDrawnSkeleton[i]; // Get the skeleton data for the current skeleton
-		// updateConditionTrajectory(motionData, used_offset * split_offset);
+		allDrawnSkeleton[i].cond_traj = createCondtionTrajectory(motionData, skeletonData, used_offset * split_offset);
 		updateSkeleton(motionData, skeletonData, used_offset * split_offset);
-		// updateConditionTrajectory(motionData, skeletonData, used_offset * split_offset);
 	}
 }
 
-function updateConditionTrajectory(motionData, offset = 0) {
-	let condition_trajectory_list = motionData.condition_trajectory;
+function createCondtionTrajectory(motionData, skeletonData, offset = 0) {
+	if (skeletonData.cond_traj) {
+		skeletonData.cond_traj.forEach((mesh) => scene.remove(mesh)); // Remove existing condition trajectories
+	}
+
+	let condition_trajectory_list = motionData.condition_trajectory;	// List of condition trajectories: B x T x 22 x 3
+	let condition_mask_list = motionData.condition_mask;	// List of condition masks: B x T x 22
 	let motionIndex = skeletonData.motionIndex || 0;
-	const currentMotion = motion_list[motionIndex];
-	framesPerMotion = currentMotion[0][0].length; // Update framesPerMotion
-	frameController.min(0).max(framesPerMotion - 1);
-	frameController.updateDisplay();
 
-	if (!currentMotion || !joint) return;
+	if (!condition_trajectory_list || !condition_mask_list) return;
 
-	for (let i = 0; i < numJoints; i++) {
-		const x = currentMotion[i][0][currentFrame] + offset;
-		const y = currentMotion[i][1][currentFrame];
-		const z = currentMotion[i][2][currentFrame];
-		joint[i].position.set(x, y, z);
-		joint[i].material.color.setHex(jointColor); // Set joint color to red
+	let maskData = condition_mask_list[motionIndex];
+	let trajectoryData = condition_trajectory_list[motionIndex];
+
+	if (maskData.length !== trajectoryData.length) {
+		console.error("Condition mask and trajectory lengths do not match:", mask.length, trajectory.length);
+		return;
 	}
+	let numFrames = trajectoryData.length; // Assuming all masks have the same number of frames
+	console.log("Number of frames in condition trajectory:", numFrames);
+	const material = new THREE.MeshBasicMaterial({ color: skeletonData.jointColor, opacity: 0.3, transparent: true });
+	const sphereGeometry = new THREE.SphereGeometry(0.03);
+	let cond_traj = []; // List to store condition trajectory meshes
 
-	for (let i = 0; i < JOINT_CONNECTIONS.length; i++) {
-		const [startIdx, endIdx] = JOINT_CONNECTIONS[i];
-		const line = bones[i];
+	for (let i = 0; i < numFrames; i++) {
+		// Downsampling the trajectory data if necessary every 
+		if (i % 2 === 0) continue; // Skip every other frame for downsampling
 
-		// Get start/end positions from each joint
-		const startPos = joint[startIdx].position;
-		const endPos = joint[endIdx].position;
+		for (let j = 0; j < numJoints; j++) {
+			if (maskData[i][j]) {
+				// create a sphere for each joint in the trajectory
+				const trajectoryMesh = new THREE.Mesh(sphereGeometry, material);
+				trajectoryMesh.castShadow = config.shadow;
+				trajectoryMesh.visible = skeletonData.cond_visible; // Set visibility based on condition visibility
+				trajectoryMesh.position.set(
+					trajectoryData[i][j][0] + offset,
+					trajectoryData[i][j][1],
+					trajectoryData[i][j][2]
+				);
 
-		// Update the line geometry's position attribute
-		const positions = line.geometry.attributes.position.array;
-		positions[0] = startPos.x;
-		positions[1] = startPos.y;
-		positions[2] = startPos.z;
-		positions[3] = endPos.x;
-		positions[4] = endPos.y;
-		positions[5] = endPos.z;
-
-		// Mark attribute as needing an update
-		line.geometry.attributes.position.needsUpdate = true;
-
-		bones[i].material.color.setHex(boneColor); // Set bone color to blue
+				scene.add(trajectoryMesh);
+				cond_traj.push(trajectoryMesh); // Add to the condition trajectory list	
+			}
+		}
 	}
+	return cond_traj; // Return the condition trajectory list
 }
 
 function updateSkeleton(motionData, skeletonData, offset = 0) {
@@ -521,7 +527,6 @@ function addRemove_DrawnSkeleton(is_add, idx, fn) {
 	let bones = [];
 	let cond_traj = [];
 	[joint, bones] = createSkeleton(joint, bones, jointColor, boneColor);
-	// cond_traj = createConditionTrajectory(cond_traj, jointColor);
 	const skeleton = {
 		joint: joint,
 		bones: bones,
@@ -536,18 +541,6 @@ function addRemove_DrawnSkeleton(is_add, idx, fn) {
 		allDrawnSkeleton.push(skeleton);
 	} else {
 		allDrawnSkeleton.pop();
-	}
-}
-
-function createConditionTrajectory(cond_traj, jointColor) {
-	if (cond_traj) {
-		cond_traj.forEach((cond_traj) => scene.remove(cond_traj));
-	}
-	for (let i = 0; i < numJoints; i++) {
-		const jointMesh = new THREE.Mesh(sphereGeometry, material);
-		jointMesh.castShadow = config.shadow;
-		scene.add(jointMesh);
-		joint.push(jointMesh);
 	}
 }
 
@@ -701,6 +694,20 @@ function createGUI() {
 					});
 				}
 			});
+		
+		// Visibility checkbox inside slot folder
+		slotFolder
+			.add(visible, "cond_visible")
+			.name("Condition Visibility")
+			.onChange((value) => {
+				const skeletonData = allDrawnSkeleton[idx];
+				allDrawnSkeleton[idx].cond_visible = value; // Update the condition visibility for this slot
+				if (skeletonData) {
+					skeletonData.cond_traj.forEach((mesh) => {
+						mesh.visible = value;
+					});
+				}
+			});
 
 		// (4) add color pickers
 		slotFolder
@@ -735,7 +742,7 @@ function createGUI() {
 		slotsFolder = gui.addFolder("Comparisons");
 		slotsFolder.add(fileParams, "addSlot").name("Add");
 		slotsFolder.add(fileParams, "removeLastSlot").name("Remove");
-		fileParams.selectors.forEach((sel, idx) => addController(slotsFolder, { visible: true }, sel, idx));
+		fileParams.selectors.forEach((sel, idx) => addController(slotsFolder, { visible: true, cond_visible: true }, sel, idx));
 	}
 
 	// 7) Initialize GUI with one slot

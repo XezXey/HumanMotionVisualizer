@@ -1,0 +1,17 @@
+{
+    "5": {
+        "file": "baselines/MaskControl/reproduced/walks.json"
+    },           
+    "9": {
+        "file": "baselines/MaskControl/reproduced/walks_bw.json"
+    },           
+    "6": {       
+        "file": "baselines/MaskControl/reproduced/runs.json"
+    },           
+    "7": {       
+        "file": "baselines/MaskControl/reproduced/joggings.json"
+    },           
+    "8": {       
+        "file": "baselines/MaskControl/reproduced/jumps.json"
+    }
+}
