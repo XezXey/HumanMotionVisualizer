@@ -405,7 +405,7 @@ function createCondtionTrajectory(motionData, skeletonData, offset = 0) {
 		return;
 	}
 	let numFrames = trajectoryData.length; // Assuming all masks have the same number of frames
-	console.log("Number of frames in condition trajectory:", numFrames);
+	// console.log("Number of frames in condition trajectory:", numFrames);
 	const material = new THREE.MeshBasicMaterial({ color: skeletonData.jointColor, opacity: 0.3, transparent: true });
 	const sphereGeometry = new THREE.SphereGeometry(0.03);
 	let cond_traj = []; // List to store condition trajectory meshes

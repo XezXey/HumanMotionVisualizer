@@ -1,0 +1,14 @@
+{
+    "5": {
+        "file": "baselines/MaskControl/new_motions/cr7_2_fw.json"
+    },           
+    "8": {
+        "file": "baselines/MaskControl/new_motions/cr7_2_bw.json"
+    },           
+    "6": {
+        "file": "baselines/MaskControl/new_motions/cr7_2_recon.json"
+    },           
+    "10": {
+        "file": "training_samples/demo_cr7_2.json"
+    }
+}
